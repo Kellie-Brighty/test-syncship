@@ -1,3 +1,33 @@
+// ── Server Status Check (runs on mount) ──
+(async function checkServerStatus() {
+  const toast = document.getElementById("server-status");
+  const toastText = document.getElementById("toast-text");
+
+  const baseUrl = "https://server.buildbeyond.art";
+
+  try {
+    const res = await fetch(baseUrl + "/api/status");
+    if (!res.ok) throw new Error("Bad response: " + res.status);
+    const data = await res.json();
+    console.log("Server status:", data);
+    toast.classList.add("active");
+    toastText.textContent = `Server active \u00b7 ${formatUptime(data.uptime)}`;
+  } catch (err) {
+    console.error("Server status check failed:", err);
+    toast.classList.add("error");
+    toastText.textContent = "Server offline";
+  }
+
+  function formatUptime(s) {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = Math.floor(s % 60);
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${sec}s`;
+    return `${sec}s`;
+  }
+})();
+
 // Particle Background Effect
 const canvas = document.getElementById("particle-canvas");
 const ctx = canvas.getContext("2d");
